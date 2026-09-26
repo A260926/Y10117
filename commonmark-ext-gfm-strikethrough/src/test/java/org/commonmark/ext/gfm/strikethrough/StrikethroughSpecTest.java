@@ -1,0 +1,41 @@
+package org.commonmark.ext.gfm.strikethrough;
+
+import java.util.List;
+import java.util.Set;
+import org.commonmark.Extension;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+import org.commonmark.testutil.RenderingTestCase;
+import org.commonmark.testutil.TestResources;
+import org.commonmark.testutil.example.Example;
+import org.commonmark.testutil.example.ExampleReader;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
+
+@ParameterizedClass
+@MethodSource("data")
+public class StrikethroughSpecTest extends RenderingTestCase {
+
+    private static final Set<Extension> EXTENSIONS = Set.of(StrikethroughExtension.create());
+    private static final Parser PARSER = Parser.builder().extensions(EXTENSIONS).build();
+    private static final HtmlRenderer RENDERER =
+            HtmlRenderer.builder().extensions(EXTENSIONS).build();
+
+    @Parameter Example example;
+
+    static List<Example> data() {
+        return ExampleReader.readExamples(TestResources.getGfmSpec(), "strikethrough");
+    }
+
+    @Test
+    public void testHtmlRendering() {
+        assertRendering(example.getSource(), example.getHtml());
+    }
+
+    @Override
+    protected String render(String source) {
+        return RENDERER.render(PARSER.parse(source));
+    }
+}

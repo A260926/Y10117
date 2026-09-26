@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "org.commonmark.android.test"
+    compileSdk 30
+
+    defaultConfig {
+        applicationId "org.commonmark.android.test"
+        minSdk 19
+        targetSdk 30
+        versionCode 1
+        versionName "1.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    // we add other modules sources in order for lint to process them (lint operates on sources)
+    sourceSets {
+        main {
+            java {
+                [
+                        '../../commonmark',
+                        '../../commonmark-ext-autolink',
+                        '../../commonmark-ext-gfm-strikethrough',
+                        '../../commonmark-ext-gfm-tables',
+                        '../../commonmark-ext-heading-anchor',
+                        '../../commonmark-ext-ins',
+                        '../../commonmark-ext-yaml-front-matter'
+                ].forEach { d ->
+                    // don't include module-info files, otherwise we get
+                    // "too many module declarations found"
+                    PatternSet patternSet = new PatternSet().exclude('**/module-info.java')
+                    srcDirs += fileTree("$d/src/main/java").matching(patternSet)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation('org.nibor.autolink:autolink:0.11.0')
+}
